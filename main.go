@@ -42,6 +42,7 @@ func main() {
 	}()
 
 	// Wait for OS signal or server error
+	// Listening for SIGINT (Ctrl+C) and SIGTERM (e.g. from Docker/systemd)
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 
@@ -49,6 +50,7 @@ func main() {
 	case sig := <-quit:
 		log.Printf("received signal %s, shutting down gracefully", sig)
 	case err := <-errCh:
+		// If the server dies on its own, log it clearly and attempt clean shutdown
 		log.Printf("server stopped unexpectedly: %v", err)
 	}
 
